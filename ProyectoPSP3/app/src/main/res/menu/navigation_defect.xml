@@ -2,17 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/atrasT"
+        android:id="@+id/atrasD"
         android:icon="@android:drawable/ic_media_previous"
         android:title="atras" />
 
     <item
-        android:id="@+id/GuardarT"
+        android:id="@+id/GuardarD"
         android:icon="@android:drawable/ic_menu_save"
         android:title="Guardar" />
 
     <item
-        android:id="@+id/siguineteT"
+        android:id="@+id/SiguinteD"
         android:icon="@android:drawable/ic_media_next"
         android:title="siguiente" />
 

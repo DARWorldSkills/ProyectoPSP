@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
@@ -19,14 +20,14 @@ public class DefectLog extends AppCompatActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
+                case R.id.atrasD:
+                    //fincion boton atras
                     return true;
-                case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
+                case R.id.GuardarD:
+                    //Funcion boton guardar
                     return true;
-                case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
+                case R.id.SiguinteD:
+                    //Funcion boton siguinte
                     return true;
             }
             return false;
@@ -41,6 +42,33 @@ public class DefectLog extends AppCompatActivity {
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // llamamos el menu del toolbar
+        getMenuInflater().inflate(R.menu.menu_defect, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+
+        int id = item.getItemId();
+
+        if (id == R.id.action_editarD){
+
+            //Aquí se pone lo que hacen los botones de editar en DefectLog
+        }
+
+        if (id == R.id.action_EliminaD){
+
+            //Aquí se pone lo que hacen los botones de eliminar en DefecLog
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }
