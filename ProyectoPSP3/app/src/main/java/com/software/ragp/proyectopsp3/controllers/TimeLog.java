@@ -1,10 +1,13 @@
 package com.software.ragp.proyectopsp3.controllers;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -17,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.software.ragp.proyectopsp3.R;
+import com.software.ragp.proyectopsp3.models.CDefectLog;
 import com.software.ragp.proyectopsp3.models.CTimeLog;
 import com.software.ragp.proyectopsp3.models.ManagerDB;
 
@@ -27,7 +31,7 @@ import java.util.List;
 
 public class TimeLog extends AppCompatActivity implements View.OnClickListener{
     TextView txtStart, txtInterrupcion, txtStop, txtDelta, txtComments;
-    Button btnStart, btnStop, btnInsert, btnUpdate, btnDelete, btnGuardar, btnAtras, btnAdelante;
+    Button btnStart, btnStop;
     Spinner spPhase;
     int modo=1;
     List<CTimeLog> cTimeLogs = new ArrayList<>();
@@ -36,7 +40,10 @@ public class TimeLog extends AppCompatActivity implements View.OnClickListener{
     int interrupcion=0;
     private TextView mTextMessage;
     ConstraintLayout contenedor;
-
+    CTimeLog cTimeLogV=new CTimeLog();
+    List<String> phaseList =new ArrayList<>();
+    FloatingActionButton btnIngresar;
+    int valor=1;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -45,27 +52,40 @@ public class TimeLog extends AppCompatActivity implements View.OnClickListener{
             switch (item.getItemId()) {
                 case R.id.atrasT:
                     //Funcion boton atras
+                    if (modo>1){
+                        retroceder();
+                    }
                     return true;
                 case R.id.GuardarT:
                     //Funcion boton Guardar
 
                     switch (modo){
                         case 1:
+
                             inputData(contenedor);
+                            selectTimeLog();
+                            valor=0;
                             break;
 
                         case 2:
                             updateData(contenedor);
+                            selectTimeLog();
+                            valor=0;
                             break;
 
                         case 3:
-                            deleteData();
+                            deleteData(contenedor);
+                            valor=0;
                             break;
                     }
 
                     return true;
                 case R.id.siguineteT:
+
                     //Funcion boton siguinete
+                    if (modo>1){
+                        avanzar();
+                    }
                     return true;
             }
             return false;
@@ -76,15 +96,14 @@ public class TimeLog extends AppCompatActivity implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_time_log);
-
         mTextMessage = (TextView) findViewById(R.id.message);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigationT);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        setContentView(R.layout.activity_time_log);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         modo=1;
         delta =0;
+        valor=0;
         interrupcion=0;
         inizialite();
         disable();
@@ -109,12 +128,13 @@ public class TimeLog extends AppCompatActivity implements View.OnClickListener{
         if (id == R.id.action_editarT) {
 
             //Aquí se pone lo que hacen los botones de editar en TImerLog
+            modo=2;
         }
 
         if (id == R.id.action_EliminarT) {
 
             //Aquí se pone lo que hacen los botones de eliminar en TImerLog
-
+            modo=3;
 
         }
 
@@ -131,11 +151,19 @@ public class TimeLog extends AppCompatActivity implements View.OnClickListener{
     private void selectTimeLog () {
         ManagerDB managerDB = new ManagerDB(this);
         cTimeLogs = managerDB.selectTimeLog(MenuP.cProyecto.getId());
+        cleanV();
+    }
 
+    public void cleanV(){
+        txtStart.setText("");
+        txtStop.setText("");
+        txtInterrupcion.setText("");
+        txtDelta.setText("");
+        txtComments.setText("");
     }
 
     private void inputPhase () {
-        List<String> phaseList = new ArrayList<>();
+        phaseList = new ArrayList<>();
         phaseList.add("Planning");
         phaseList.add("Design");
         phaseList.add("Code");
@@ -157,23 +185,21 @@ public class TimeLog extends AppCompatActivity implements View.OnClickListener{
 
         btnStart = findViewById(R.id.btnStart);
         btnStop = findViewById(R.id.btnStop);
-
-
+        spPhase = findViewById(R.id.spPhase);
+        contenedor= findViewById(R.id.container);
+        btnIngresar= findViewById(R.id.btnIngresar);
 
         btnStart.setOnClickListener(this);
         btnStop.setOnClickListener(this);
 
-        btnGuardar.setEnabled(true);
+        btnIngresar.setOnClickListener(this);
 
-        spPhase = findViewById(R.id.spPhase);
-        contenedor= findViewById(R.id.container);
+
     }
 
     @Override
     public void onClick (View v){
         switch (v.getId()) {
-
-            
 
             case R.id.btnStart:
                 inputDateStart();
@@ -184,6 +210,11 @@ public class TimeLog extends AppCompatActivity implements View.OnClickListener{
                 inputDateStop();
                 getDiferencia();
                 Snackbar.make(v, "Se ha calculado Delta ", Snackbar.LENGTH_SHORT).show();
+                break;
+
+            case R.id.btnIngresar:
+                modo=1;
+                cleanV();
                 break;
         }
     }
@@ -234,28 +265,23 @@ public class TimeLog extends AppCompatActivity implements View.OnClickListener{
 
     private void inputData (View v){
         CTimeLog ctimeLog = new CTimeLog();
-        try {
-            ctimeLog.setPhase(spPhase.getSelectedItem().toString());
-            ctimeLog.setStart(txtStart.getText().toString());
-            ctimeLog.setStop(txtStop.getText().toString());
-            ctimeLog.setInterrupcion(txtInterrupcion.getText().toString());
-            ctimeLog.setDelta(txtDelta.getText().toString());
-            ctimeLog.setComments(txtComments.getText().toString());
-            ctimeLog.setProyecto(MenuP.cProyecto.getId());
-            ManagerDB managerDB = new ManagerDB(this);
-            managerDB.inputTimeLog(ctimeLog, v);
-            selectTimeLog();
+        ctimeLog.setPhase(spPhase.getSelectedItem().toString());
+        ctimeLog.setStart(txtStart.getText().toString());
+        ctimeLog.setStop(txtStop.getText().toString());
+        ctimeLog.setInterrupcion(txtInterrupcion.getText().toString());
+        ctimeLog.setDelta(txtDelta.getText().toString());
+        ctimeLog.setComments(txtComments.getText().toString());
+        ctimeLog.setProyecto(MenuP.cProyecto.getId());
+        ManagerDB managerDB = new ManagerDB(this);
+        managerDB.inputTimeLog(ctimeLog, v);
+        selectTimeLog();
 
-
-        } catch (Exception e) {
-            Toast.makeText(this, "Faltan campos por llenar", Toast.LENGTH_SHORT).show();
-        }
     }
-
     private void updateData (View view){
         if (cTimeLogs.size() > 0) {
             CTimeLog ctimeLog = new CTimeLog();
             try {
+                ctimeLog.setId(cTimeLogV.getId());
                 ctimeLog.setPhase(spPhase.getSelectedItem().toString());
                 ctimeLog.setStart(txtStart.getText().toString());
                 ctimeLog.setStop(txtStop.getText().toString());
@@ -264,7 +290,7 @@ public class TimeLog extends AppCompatActivity implements View.OnClickListener{
                 ctimeLog.setComments(txtComments.getText().toString());
                 ctimeLog.setProyecto(MenuP.cProyecto.getId());
                 ManagerDB managerDB = new ManagerDB(this);
-                managerDB.inputTimeLog(ctimeLog, view);
+                managerDB.updateTimeLog(ctimeLog, view);
                 selectTimeLog();
 
 
@@ -276,16 +302,89 @@ public class TimeLog extends AppCompatActivity implements View.OnClickListener{
         }
     }
 
-    private void deleteData () {
-        if (cTimeLogs.size() > 0) {
-            ManagerDB managerDB = new ManagerDB(this);
 
 
-        } else {
-            Toast.makeText(this, "No hay TimeLogs para eliminar", Toast.LENGTH_SHORT).show();
+    private void deleteData(final View v){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Eliminar");
+        builder.setMessage("Desea elimnar el DefectLog");
+        builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                ManagerDB managerDB = new ManagerDB(TimeLog.this);
+                managerDB.deleteTimeLog(cTimeLogV,v);
+                selectTimeLog();
+
+            }
+        });
+
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        builder.show();
+    }
+
+
+    public void avanzar(){
+        if (cTimeLogs.size() > valor) {
+            valor++;
+            inputValues();
+        }
+
+
+        if (cTimeLogs.size()==1){
+            valor=1;
+            inputValues();
+        }
+
+    }
+
+    public void retroceder(){
+        if (valor>1) {
+            if (cTimeLogs.size() >= valor && valor != 0) {
+                valor--;
+                inputValues();
+            }
+        }else {
+            valor=1;
+            inputValues();
+        }
+
+        if (valor==0){
+            valor=1;
+            inputValues();
+        }
+
+        if (cTimeLogs.size()==1){
+            valor=1;
+            inputValues();
         }
     }
 
+    public void inputValues(){
+        cTimeLogV= cTimeLogs.get(valor-1);
+        txtStart.setText(cTimeLogV.getStart());
+        txtInterrupcion.setText(cTimeLogV.getInterrupcion());
+        txtStop.setText(cTimeLogV.getStop());
+        txtDelta.setText(cTimeLogV.getDelta());
+        txtComments.setText(cTimeLogV.getComments());
+
+        for (int i=0; i<phaseList.size(); i++) {
+            try {
+                if (cTimeLogV.getPhase().equals(phaseList.get(i))) {
+                    spPhase.setSelection(i);
+                }
+            }catch (Exception e){
+
+            }
+        }
+
+    }
 
 
 }

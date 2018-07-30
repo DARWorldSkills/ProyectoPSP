@@ -1,12 +1,15 @@
 package com.software.ragp.proyectopsp3.controllers;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,9 +19,11 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.software.ragp.proyectopsp3.R;
 import com.software.ragp.proyectopsp3.models.CDefectLog;
+import com.software.ragp.proyectopsp3.models.GestorDB;
 import com.software.ragp.proyectopsp3.models.ManagerDB;
 
 import java.text.SimpleDateFormat;
@@ -38,7 +43,7 @@ public class DefectLog extends AppCompatActivity implements View.OnClickListener
     boolean bandera1 = false;
     List<CDefectLog> cDefectLogs = new ArrayList<>();
     int []tiempo = {0,0};
-    int modo=0;
+    int modo=1;
     ConstraintLayout contenedor;
     private TextView mTextMessage;
     List<String> typeList;
@@ -51,6 +56,7 @@ public class DefectLog extends AppCompatActivity implements View.OnClickListener
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
+
 
                 case R.id.atrasD:
                     //Funcion boton atras
@@ -69,14 +75,15 @@ public class DefectLog extends AppCompatActivity implements View.OnClickListener
                             break;
 
                         case 2:
+                            stop_chronometer();
                             updateData(contenedor);
                             selectDefectLog();
                             valor=0;
                             break;
 
                         case 3:
+                            stop_chronometer();
                             deleteData(contenedor);
-                            selectDefectLog();
                             valor=0;
                             break;
                     }
@@ -106,7 +113,7 @@ public class DefectLog extends AppCompatActivity implements View.OnClickListener
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         bandera = true;
         tiempo = new int []{0,0};
-        modo=0;
+        modo=1;
         bandera1 = false;
         inizialite();
         onClickThis();
@@ -247,7 +254,7 @@ public class DefectLog extends AppCompatActivity implements View.OnClickListener
     private void updateData(View v) {
         ManagerDB managerDB = new ManagerDB(this);
         CDefectLog cDefectLog = new CDefectLog();
-        cDefectLog.setId(cDefectLog.getId());
+        cDefectLog.setId(cDefectLogV.getId());
         cDefectLog.setDate(txtDate.getText().toString());
         cDefectLog.setType(spType.getSelectedItem().toString());
         cDefectLog.setFixtime(txtFixTime.getText().toString());
@@ -257,8 +264,31 @@ public class DefectLog extends AppCompatActivity implements View.OnClickListener
         managerDB.updateDefectLog(cDefectLog,v);
     }
 
-    private void deleteData(View v){
+    private void deleteData(final View v){
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Eliminar");
+        builder.setMessage("Desea elimnar el DefectLog");
+        builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                ManagerDB managerDB = new ManagerDB(DefectLog.this);
+                CDefectLog cDefectLog = new CDefectLog();
+                cDefectLog.setId(cDefectLogV.getId());
+                managerDB.deleteDefectLog(cDefectLog,v);
+                selectDefectLog();
+
+            }
+        });
+
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        builder.show();
     }
 
 
@@ -393,10 +423,11 @@ public class DefectLog extends AppCompatActivity implements View.OnClickListener
     }
 
     public void avanzar(){
-        if (cDefectLogs.size()>valor){
-            valor++;
-            inputValues();
-        }
+        if (cDefectLogs.size() > valor) {
+                valor++;
+                inputValues();
+            }
+
 
         if (cDefectLogs.size()==1){
             valor=1;
@@ -406,8 +437,18 @@ public class DefectLog extends AppCompatActivity implements View.OnClickListener
     }
 
     public void retroceder(){
-        if (cDefectLogs.size()<valor){
-            valor--;
+        if (valor>1) {
+            if (cDefectLogs.size() >= valor && valor != 0) {
+                valor--;
+                inputValues();
+            }
+        }else {
+            valor=1;
+            inputValues();
+        }
+
+        if (valor==0){
+            valor=1;
             inputValues();
         }
 
@@ -415,7 +456,6 @@ public class DefectLog extends AppCompatActivity implements View.OnClickListener
             valor=1;
             inputValues();
         }
-
     }
 
     public void inputValues(){
@@ -454,8 +494,6 @@ public class DefectLog extends AppCompatActivity implements View.OnClickListener
 
             }
         }
-
-
 
     }
 

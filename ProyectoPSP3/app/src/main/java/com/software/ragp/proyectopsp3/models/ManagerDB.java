@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,15 +106,48 @@ public class ManagerDB {
         values.put("DELTA",cTimeLog.getDelta());
         values.put("COMMENTS",cTimeLog.getComments());
         values.put("PROYECTO",cTimeLog.getProyecto());
+        db.insert("TIMELOG", null, values);
+        Snackbar.make(view,"Se ha guardado correctamente el TimeLog",Snackbar.LENGTH_SHORT).show();
+
+
+        closeDB();
+
+    }
+
+    public void updateTimeLog(CTimeLog cTimeLog, View view){
+        openWriteDB();
+        ContentValues values = new ContentValues();
+        values.put("PHASE",cTimeLog.getPhase());
+        values.put("START",cTimeLog.getStart());
+        values.put("INTERRUPCION",cTimeLog.getInterrupcion());
+        values.put("STOP",cTimeLog.getStop());
+        values.put("DELTA",cTimeLog.getDelta());
+        values.put("COMMENTS",cTimeLog.getComments());
+
+        String [] parameters = {Integer.toString(cTimeLog.getId())};
 
         try {
-            db.insert("TIMELOG", null, values);
-            Snackbar.make(view,"Se ha guardado correctamente el TimeLog",Snackbar.LENGTH_SHORT).show();
+            db.update("TIMELOG", values,"IDTIMELOG=?",parameters);
+            Snackbar.make(view,"Se ha actualizado correctamente el TimeLog",Snackbar.LENGTH_SHORT).show();
+        }catch (Exception e){
+            Log.e("Error Actualizar: ",e.getMessage());
+        }
+
+        closeDB();
+    }
+
+
+    public void deleteTimeLog(CTimeLog cTimeLog, View view){
+        openWriteDB();
+        String [] parameters = {Integer.toString(cTimeLog.getId())};
+
+        try {
+            db.delete("TIMELOG", "IDTIMELOG=?",parameters);
+            Snackbar.make(view,"Se ha eliminado el DefectLog",Snackbar.LENGTH_SHORT).show();
         }catch (Exception e){
         }
 
         closeDB();
-
     }
 
     public List<CDefectLog> selectDefectLog(int proyecto){
@@ -179,6 +213,19 @@ public class ManagerDB {
             Log.e("Error Actualizar: ",e.getMessage());
         }
 
+    }
+
+    public void deleteDefectLog(CDefectLog cDefectLog, View view){
+        openWriteDB();
+        String [] parameters = {Integer.toString(cDefectLog.getId())};
+        try {
+            db.delete("DEFECTLOG", "IDDEFECTLOG=?",parameters);
+            Snackbar.make(view,"Se ha eliminado el DefectLog",Snackbar.LENGTH_SHORT).show();
+        }catch (Exception e){
+
+        }
+
+        closeDB();
     }
 
 

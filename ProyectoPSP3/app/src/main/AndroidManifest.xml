@@ -9,24 +9,25 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".controllers.MenuP">
+        <activity android:name=".controllers.MenuP" android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".controllers.MenuProyecto" />
+        <activity android:name=".controllers.MenuProyecto" android:screenOrientation="portrait"/>
         <activity
             android:name=".controllers.TimeLog"
-            android:label="@string/title_activity_time_log" />
+            android:label="@string/title_activity_time_log" android:screenOrientation="portrait"/>
         <activity
             android:name=".controllers.DefectLog"
-            android:label="@string/title_activity_defect_log" />
+            android:label="@string/title_activity_defect_log" android:screenOrientation="portrait"/>
         <activity
             android:name=".controllers.ProjectPlanSummary"
             android:label="@string/title_activity_project_plan_summary"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>
