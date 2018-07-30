@@ -13,6 +13,9 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="ingresetiempoestimado">Ingrese el tiempo estimado</string>
     <string name="agregarProyecto">Ingrese el nombre del proyecto</string>
+    <string name="timelog">Time Log</string>
+    <string name="defectlog">Defect Log</string>
+    <string name="projectplansummary">Project Plan Summary</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

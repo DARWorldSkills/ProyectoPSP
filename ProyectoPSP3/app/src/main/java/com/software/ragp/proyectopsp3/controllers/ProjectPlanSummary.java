@@ -20,6 +20,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.software.ragp.proyectopsp3.R;
+import com.software.ragp.proyectopsp3.fragments.FragmentPhaseI;
+import com.software.ragp.proyectopsp3.fragments.FragmentPhaseRemoved;
+import com.software.ragp.proyectopsp3.fragments.FragmentTime;
 
 public class ProjectPlanSummary extends AppCompatActivity {
 
@@ -141,6 +144,20 @@ public class ProjectPlanSummary extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
+            Fragment fragment;
+            switch (position){
+                case 0:
+                    fragment = new FragmentTime();
+                    return fragment;
+
+                case 1:
+                    fragment = new FragmentPhaseI();
+                    return fragment;
+
+                case 2:
+                    fragment = new FragmentPhaseRemoved();
+                    return fragment;
+            }
             return PlaceholderFragment.newInstance(position + 1);
         }
 

@@ -117,6 +117,7 @@ public class ManagerDB {
     }
 
     public List<CDefectLog> selectDefectLog(int proyecto){
+        openReadDB();
         List<CDefectLog> results = new ArrayList<>();
         Cursor cursor = db.rawQuery("SELECT * FROM DEFECTLOG WHERE PROYECTO="+proyecto+";",null);
         if (cursor.moveToFirst()){
@@ -137,11 +138,12 @@ public class ManagerDB {
         }
 
         cursor.close();
-
+        closeDB();
         return results;
     }
 
     public void inputDefectLog(CDefectLog cDefectLog, View view){
+        openWriteDB();
         ContentValues values = new ContentValues();
         values.put("DATE",cDefectLog.getDate());
         values.put("TYPE",cDefectLog.getType());
@@ -155,10 +157,12 @@ public class ManagerDB {
             Snackbar.make(view,"Se ha guardado correctamente el DefectLog",Snackbar.LENGTH_SHORT).show();
         }catch (Exception e){
         }
+        closeDB();
 
     }
 
     public void updateDefectLog(CDefectLog cDefectLog,View view ){
+        openWriteDB();
         ContentValues values = new ContentValues();
         values.put("DATE",cDefectLog.getDate());
         values.put("TYPE",cDefectLog.getType());
